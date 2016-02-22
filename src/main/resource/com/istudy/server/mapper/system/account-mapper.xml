@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.system.service.AccountService">
+	 <select id="getAllAccount" resultType="com.istudy.server.system.vo.AccountVO">
+	 	<![CDATA[
+	 	select 
+	 	username,password,account_desc,enterpriseID
+	 	from system_account
+	 	]]>
+	 </select>
+	 <select id="getAccountInfoById" parameterType="string" resultType="com.istudy.server.system.vo.AccountVO">
+		select 
+	 	username,password,account_desc,enterpriseID
+	 	from system_account
+	 	where username=#{username}
+	 </select>
+	 <select id="getActionByUsername" parameterType="string" resultType="com.istudy.server.system.vo.ActionVO">
+	 	select dd.actionID from (
+		select a.username,e.actionID from 
+		system_account a,system_account2role b,system_role c,system_role2action d,system_action e
+		where a.username=b.username and b.roleID=c.roleID and c.roleID=d.roleID and d.actionID=e.actionID
+		and e.actionURL=#{actionURL}
+		)  dd  where dd.username=#{username}
+	 </select>
+	 <insert id="saveAccountInfo">
+	     insert into
+	     system_account
+	     (username,password,account_desc,enterpriseID,create_date)
+	     VALUES
+	     (#{username},#{password},#{account_desc},#{enterpriseID},sysdate())
+	 </insert>
+	 <update id="modifyAccountInfo">
+	     update
+	     system_account
+	     set
+	     account_desc=#{account_desc},
+	     password=#{password},
+	     enterpriseID=#{enterpriseID}
+	     where username=#{username}
+	 </update>
+	 <update id="modPassword">
+	     update
+	     system_account
+	     set
+	     password=#{password}
+	     where username=#{username}
+	 </update>
+	 <delete id="deleteAccountInfo" parameterType="string">
+	     delete from system_account
+	     where username=#{username}
+	 </delete>
+	 <delete id="deleteAccount2Role" parameterType="string">
+	     delete from system_account2role
+	     where username=#{username}
+	 </delete>
+</mapper>

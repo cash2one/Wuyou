@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.system.service.RoleService">
+	 <select id="getAllRoles" resultType="com.istudy.server.system.vo.RoleVO">
+	 	<![CDATA[
+	 	select 
+	 	roleID,roleName,roleDesc
+	 	from system_role
+	 	]]>
+	 </select>
+	 <select id="getRoleInfoByUsername" parameterType="string" resultType="com.istudy.server.system.vo.RoleVO">
+		select 
+	 	a.roleName
+	 	from system_account2role b, system_role a
+	 	where a.roleID=b.roleID and b.username=#{username}
+	 </select>
+	 <insert id="saveAccount2RoleInfo">
+	     insert into
+	     system_account2role
+	     (roleID,username)
+	     VALUES
+	     (#{roleID},#{username})
+	 </insert>
+	 <insert id="linkRole2Action">
+	     insert into
+	     system_role2action
+	     (roleID,actionID)
+	     VALUES
+	     (#{roleID},#{actionID})
+	 </insert>
+	 <select id="getRoleInfoById" parameterType="string" resultType="com.istudy.server.system.vo.RoleVO">
+		select 
+	 	roleID,roleName,roleDesc
+	 	from system_role
+	 	where roleID=#{roleID}
+	 </select>
+	 <select id="getActionInfoByRoleId" parameterType="string" resultType="com.istudy.server.system.vo.ActionVO">
+		select 
+	 	a.actionName,a.actionID
+	 	from system_action a,system_role2action b
+	 	where a.actionID=b.actionID and b.roleID=#{roleID}
+	 </select>
+	 <select id="checkRoleByUsername" resultType="com.istudy.server.system.vo.RoleVO">
+		select 
+	 	roleID
+	 	from system_account2role
+	 	where roleID=#{roleID} and username=#{username}
+	 </select>
+	 <select id="checkActionByRoleID" resultType="com.istudy.server.system.vo.RoleVO">
+		select 
+	 	roleID
+	 	from system_role2action
+	 	where roleID=#{roleID} and actionID=#{actionID}
+	 </select>
+	 <insert id="saveRoleInfo">
+	     insert into
+	     system_role
+	     (roleID,roleName,roleDesc,create_date)
+	     VALUES
+	     (#{roleID},#{roleName},#{roleDesc},sysdate())
+	 </insert>
+	 <update id="modifyRoleInfo">
+	     update
+	     system_role
+	     set
+	     roleName=#{roleName},
+	     roleDesc=#{roleDesc}
+	     where roleID=#{roleID}
+	 </update>
+	 <delete id="deleteRoleInfo" parameterType="string">
+	     delete from system_role
+	     where roleID=#{roleID}
+	 </delete>
+	 <delete id="removeAccount2Role">
+	     delete from system_account2role
+	     where roleID=#{roleID} and username=#{username}
+	 </delete>
+	 <!-- 删除角色与功能关联使用 -->
+	 <delete id="removeRoleWAction">
+	     delete from system_role2action
+	     where roleID=#{roleID} and actionID=#{actionID}
+	 </delete>
+	 <!-- 删除角色使用 -->
+	 <delete id="removeRole2Action">
+	     delete from system_role2action
+	     where roleID=#{roleID}
+	 </delete>
+</mapper>

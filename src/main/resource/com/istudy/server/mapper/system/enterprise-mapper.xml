@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.system.service.EnterpriseService">
+	 <select id="getAllEnterprise" resultType="com.istudy.server.system.vo.EnterpriseVO">
+	 	<![CDATA[
+	 	select 
+	 	enterpriseID,enterpriseName,enterpriseDesc,vendorType,enterpriseHeader,enterpriseFooter
+	 	from system_enterprise
+	 	]]>
+	 </select>
+	 <select id="getEnterpriseInfoById" parameterType="string" resultType="com.istudy.server.system.vo.EnterpriseVO">
+		select 
+	 	enterpriseID,enterpriseName,enterpriseDesc,vendorType,enterpriseHeader,enterpriseFooter
+	 	from system_enterprise
+	 	where enterpriseID=#{enterpriseID}
+	 </select>
+	 <select id="getFooterInfo" parameterType="string" resultType="String">
+		SELECT footerId 
+			FROM cms_minisite_footer
+	 </select>
+	 <insert id="saveEnterpriseInfo">
+	     insert into
+	     system_enterprise
+	     (enterpriseID,enterpriseName,enterpriseDesc,vendorType,enterpriseHeader,enterpriseFooter,create_date)
+	     VALUES
+	     (#{enterpriseID},#{enterpriseName},#{enterpriseDesc},#{vendorType},#{enterpriseHeader},#{enterpriseFooter},sysdate())
+	 </insert>
+	 <update id="modifyEnterpriseInfo">
+	     update
+	     system_enterprise
+	     set
+	     enterpriseName=#{enterpriseName},
+	     enterpriseDesc=#{enterpriseDesc},
+	     enterpriseHeader=#{enterpriseHeader},
+	     enterpriseFooter=#{enterpriseFooter},
+	     vendorType=#{vendorType}
+	     where enterpriseID=#{enterpriseID}
+	 </update>
+	 <delete id="deleteEnterpriseInfo" parameterType="string">
+	     delete from system_enterprise
+	     where enterpriseID=#{enterpriseID}
+	 </delete>
+	 <delete id="deleteAccountByEnterpriseID" parameterType="string">
+	     delete from system_account
+	     where enterpriseID=#{enterpriseID}
+	 </delete>
+</mapper>

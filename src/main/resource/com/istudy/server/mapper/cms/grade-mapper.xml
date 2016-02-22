@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.cms.service.GradeService">
+	 <select id="getAllGradeInfo" resultType="com.istudy.server.cms.vo.GradeVO">
+	 	<![CDATA[
+	 	SELECT 
+	 	id,grade_name as gradeName,grade_no  as gradeNO
+	 	FROM cms_grade_info
+	 	where activate='Y'
+	 	]]>
+	 </select>
+</mapper>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.cms.service.SchoolService">
+	 <select id="getAllSchools" resultType="com.istudy.server.cms.vo.SchoolVO">
+	 	<![CDATA[
+	 	SELECT 
+	 	id,
+	 	school_id as schoolId,
+	 	school_name  as schoolName,
+	 	school_city as schoolCity
+	 	FROM cms_school_info
+	 	]]>
+	 </select>
+</mapper>

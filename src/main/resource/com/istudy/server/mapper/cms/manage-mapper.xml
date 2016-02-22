@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.cms.service.CMSManageService">
+<select id="getUserByName" resultType="com.istudy.server.cms.vo.LoginVO" >
+	 	 <![CDATA[ 
+		 	 select 
+		 	 user_name as userName,
+		 	 password,
+		 	 role_id as roleId,
+		 	 real_name as realName
+		 	 from cms_login_info 
+		 	 where user_name=#{userName} 
+	 	 ]]> 
+	 </select>
+<insert id="register">
+	INSERT INTO cms_login_info
+		(user_name,password,role_id,real_name)
+		VALUES
+		(#{userName},#{password},#{roleId},#{realName})
+	
+	</insert>
+	
+
+	 <select id="getRoleInfo" resultType="com.istudy.server.cms.vo.RoleVO">
+	 	<![CDATA[
+	 	 SELECT 
+	 	 id,
+	 	 role_name as roleName,
+	 	 role_power as rolePower
+	 	 FROM cms_role_info
+	 	 WHERE id IS NOT NULL
+	 	]]>
+	 </select>
+
+</mapper>

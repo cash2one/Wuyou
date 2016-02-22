@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.system.service.ActionService">
+	 <select id="getAllActions" resultType="com.istudy.server.system.vo.ActionVO">
+	 	<![CDATA[
+	 	select 
+	 	actionID,actionName,actionURL,actionDesc
+	 	from system_action
+	 	]]>
+	 </select>
+	 <select id="getActionInfoById" parameterType="string" resultType="com.istudy.server.system.vo.ActionVO">
+		select 
+	 	actionID,actionName,actionURL,actionDesc
+	 	from system_action
+	 	where actionID=#{actionID}
+	 </select>
+	 <select id="getActionInfoByURL" parameterType="string" resultType="com.istudy.server.system.vo.ActionVO">
+		select 
+	 	actionID
+	 	from system_action
+	 	where actionURL=#{actionURL}
+	 </select>
+	 <insert id="saveActionInfo">
+	     insert into
+	     system_action
+	     (actionID,actionName,actionURL,actionDesc)
+	     VALUES
+	     (#{actionID},#{actionName},#{actionURL},#{actionDesc})
+	 </insert>
+	 <update id="modifyActionInfo">
+	     update
+	     system_action
+	     set
+	     actionName=#{actionName},
+	     actionURL=#{actionURL},
+	     actionDesc=#{actionDesc}
+	     where actionID=#{actionID}
+	 </update>
+	 <delete id="deleteActionInfo" parameterType="string">
+	     delete from system_action
+	     where actionID=#{actionID}
+	 </delete>
+</mapper>

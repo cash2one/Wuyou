@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+    <title>【校园+】—家长想要的，这里都有！</title>
+    <style>
+        @media screen {
+            body, h1, h2, h3, p{margin:0;}
+            body{font:87.5%/1.5 sans-serif;color:#333;}
+            #page{padding-bottom:20px;}
+            .title{padding:8px;font-size:1.25em;line-height:1.3;font-weight:normal;text-align:center;
+                color:#fff;background-color:#38cc9e;}
+            .title span{font-size:.8em;}
+            .article{margin:8px;}
+            .article h2{margin-bottom:.2em;font-size:1.1em;}
+            .article p{margin-bottom:.8em;}
+            .article img{margin:1em 0;display:block;width:100%;height:auto;border:none;}
+            .article .mark{padding:10px;background-color:#fdf9d6;border:1px solid #eae29f;}
+            .download-item{margin:1em 0;text-align:center;}
+            .btn-download{padding:10px 0;display:inline-block;width:260px;background-color:#38cc9e;font-size:1.2em;line-height:1;text-decoration:none;text-align:center;color:#fff;white-space:nowrap;border-radius:8px;}
+            .btn-download img{margin:0 10px 0 0;display:inline-block;width:auto;height:1.5em;border:none;vertical-align:middle;}
+            .btn-download span{vertical-align:middle;}
+            .btn-download:hover, .btn-download:active{background-color:#24af84;text-decoration:none;color:#fff;}
+            .video{margin-bottom:15px;}
+
+            .overlay{position:fixed;left:0;top:0;z-index:100;width:100%;height:100%;background-color:hsla(0, 0%, 0%, .5);display:none;}
+            .overlay img{position:absolute;right:30px;top:15px;width:76px;height:62px;}
+            .overlay p{position:absolute;right:50px;top:50px;color:#fff;font-size:1.3em;font-style:italic;
+                line-height:1.5;text-shadow:0 0 3px hsla(0, 0%, 0%, .2);}
+        }
+        @media screen and (min-device-width: 1024px) {
+            #page{margin:0 auto;max-width:640px;}
+        }
+    </style>
+    <link rel="stylesheet" href="flowplayer/skin/minimalist.css">
+</head>
+<body>
+    <div id="page">
+        <h1 class="title">【校园+】—家长想要的，这里都有！</h1>
+        <div class="article">
+            <p>为孩子的升学抓狂过吗？<br>对升学政策一头雾水？<br>孩子的成绩原地踏步没法提升？</p>
+            <p>一款全新的家长互动APP——“校园+”为你带来解决方案！</p>
+
+            <div id="contentVideo" class="video" style="background-image:url(img/video-cover-20140919.jpg);">
+                
+            </div>
+
+            <!-- <div id="downloadItemTop" class="download-item">
+                <a href="http://share.istudy.com.cn/dl/xiaoyuan.apk" class="btn-download" target="_blank"><img src="http://share.istudy.com.cn/img/ico-andriod.png" alt="android"><span>Android版下载</span></a>
+            </div> -->
+
+            <p>1、大批<strong>名师</strong>、<strong>专家</strong>、<strong>名记者</strong>扎根，为您进行个性化的答疑。</p>
+            <p>2、海量学习资源，<strong>省内名校真题、课程、学霸笔记</strong>为您独家奉上。</p>
+            <p>3、分享自己的教育心得，和<strong>牛爸牛妈</strong>做朋友，名师讲座和家长论坛免费参加。</p>
+            <p>还等什么？猛戳下面按钮，做家长达人！</p>
+
+            <div id="downLoadItemBtm" class="download-item">
+                <!-- <a href="itms-services://?action=download-manifest&url=https://xiaoyuan.istudy.com.cn:8443/leaf/XiaoYuan.plist" class="btn-download" target="_blank"><img src="http://share.istudy.com.cn/img/ico-ios.png" alt="ios"><span>iOS版下载</span></a> -->
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay">
+        <img class="arrows" src="http://share.istudy.com.cn/img/icon-arrows.png" alt=""/>
+        <p>1点击右上角图标<br/>2选择【在浏览器中打开】</p>
+    </div>
+    
+    <script type="text/javascript">
+        (function() {
+            var browser = {
+                version: (function() {
+                    var u = navigator.userAgent;
+                    return {
+                        Mobile: /Mobile|Android|Symbian/i.test(u),
+                        Android: /Android|Adr/i.test(u),
+                        iOS: /iPhone|iPad|iPod/i.test(u),
+                        Symbian: /Symbian/i.test(u),
+                        WindowsPhone: /Windows Phone/i.test(u),
+                        BlankBerry: /BB/i.test(u),
+                        weChat: /MicroMessenger/i.test(u)
+                    }
+                }())
+            };
+
+            function on(dom, type, callback) {
+                if(dom.addEventListener) {
+                    dom.addEventListener(type, callback, false);
+                } else {
+                    dom.attachEvent("on" + type, callback);
+                }
+            }
+
+            // 统计
+            function statistics(action, idtype, miniUri) {
+                var img = new Image();
+
+                img.src = "http://wuyou.istudy.com.cn//xxtStat/addRecordV2.do?" + "action=" +
+                        action + "&idtype=" +
+                        idtype + "&miniUri=" +
+                        miniUri;
+            }
+
+            var android = '<a href="http://share.istudy.com.cn/dl/xiaoyuan.apk" class="btn-download" target="_blank"><img src="http://share.istudy.com.cn/img/ico-andriod.png" alt="android"><span>校园+Android版下载</span></a>';
+            var ios = '<a href="itms-services://?action=download-manifest&url=https://xiaoyuan.istudy.com.cn:8443/leaf/XiaoYuan.plist" class="btn-download" target="_blank"><img src="http://share.istudy.com.cn/img/ico-ios.png" alt="ios"><span>校园+iOS版下载</span></a>';
+
+            // var download01 = document.getElementById("downloadItemTop");
+            var download02 = document.getElementById("downLoadItemBtm");
+
+            if(browser.version.iOS) {
+                download02.innerHTML = ios;
+            } else {
+                download02.innerHTML = android;
+            }
+
+            var btn02 = download02.childNodes[0],
+                video = document.getElementById("contentVideo"),
+                overlay = document.getElementById("overlay");
+
+            on(btn02, "click", function() {
+                statistics("link-download", "2014091901", "2014091901");
+            });
+
+            on(video, "click", function() {
+                if(!video.getAttribute("played")) {
+                    statistics("play-video", "2014091901", "2014091901");
+                    video.setAttribute("played", "1");
+                }
+            });
+
+
+            if(browser.version.weChat) {
+                
+                var showMsg = function() {
+                    overlay.style.display = "block";
+
+                    on(overlay, "touchmove", function(event) {
+                        event.preventDefault();
+                    });
+                }
+
+                on(btn02, "click", showMsg);
+            }
+
+            statistics("enter-page", "2014091901", "2014091901");
+        }());
+    </script>
+
+    <script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="flowplayer/flowplayer.min.js"></script>
+    <script>
+        (function() {
+            flowplayer.conf = {
+                ratio: 272/480,
+                fullscreen: true,
+                tooltip: false,
+                embed: false,
+                preload: "auto",
+                splash: true,
+                volume: 0.8
+            };
+
+            $("#contentVideo").flowplayer({
+                playlist: [
+                    [
+                        {mp4: "http://v.polyv.net/uc/video/getMp4?vid=9db4ad2a0d2d84a1f9c3ddc22af46f12_9"}
+                    ]
+                ]
+            });
+        }());
+    </script>
+</body>
+</html>

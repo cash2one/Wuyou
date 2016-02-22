@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.xxt.service.XXTMinisiteService">
+	<update id="saveSubjectChooseSubscribeAccount">
+	update xxt_subject_choose_account
+	set 
+	phone=#{phone},
+	uuid=#{uuid},
+	datetime=sysdate(),
+	state=1
+	where id = #{id};
+	</update>
+	
+	<select id="nextSubjectChooseSubscribeAccount" resultMap="acct">
+	select ID,username,password,state
+	from xxt_subject_choose_account
+	where state = 0 
+	limit 0,1;
+	</select>
+	
+	<select id="hasSubjectChooseSubscribeAccount" resultType="java.lang.Integer">
+	select count(*) from 
+	xxt_subject_choose_account
+	where state = 0;
+	</select>
+	
+	<insert id="saveSubjectChooseSubscribe">
+	insert into xxt_subject_choose_subscribe
+	(phone,uuid,datetime)
+	values(#{phone}, #{uuid}, sysdate());
+	</insert>
+	
+	<insert id="saveQues">
+	insert into xxt_ques
+	(first,second,third,fourth,fifth,sixth,seventh,eighth,ninth,tenth,source,time)
+	values(#{first}, #{second}, #{third},#{fourth},#{fifth},#{sixth},#{seventh},#{eighth},#{ninth},#{tenth},#{source},sysdate());
+	</insert>
+	
+	
+	<resultMap type="com.istudy.server.xxt.vo.XXTSubjectChooseAccount" id="acct"></resultMap>
+</mapper>

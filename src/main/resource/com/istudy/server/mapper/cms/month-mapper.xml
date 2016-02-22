@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.cms.service.MonthService">
+	 <select id="getAllActivateMonths" resultType="com.istudy.server.cms.vo.MonthVO">
+	 	<![CDATA[
+	 	select 
+	 	month_id as monthId,
+	 	month_name as monthName
+	 	from cms_month_info 
+	 	where activate='Y'
+	 	]]>
+	 </select>
+</mapper>

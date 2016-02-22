@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.xxt.service.XXTTaskService">
+	 <select id="getTaskTitleList" resultType="com.istudy.server.xxt.vo.HisTaskVO">
+	 	 <![CDATA[
+		 	 SELECT 
+			 	 t.id,
+			 	 m.type as miniType,
+			 	 t.task_name as taskName
+		 	  FROM cms_task_info t , cms_minisite_info m
+		 	  where 
+		 	  t.active_date <= sysdate()
+		 	  and
+		 	  (t.grades like  '%,${gradeId}%,' and t.citys like  '%,${cityId}%,')
+		 	  and t.minisite_id=m.id
+		 	  order by t.id desc
+		 	  LIMIT 0,10
+	 	 ]]> 
+	 </select>
+	 
+	  <insert id="saveTeacherSendMsgInfo" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO 
+		cms_tea_send_his 
+		(user_id,
+		task_id,
+		msg_details,
+		send_users,
+		type,
+		task_name,
+		mini_type,
+		send_type,
+		minisite_id,
+		send_time,
+		send_status,
+		amount_users,
+		tea_city,
+		send_names,
+		create_date,
+		tea_name,
+		school_name) VALUES 
+		(#{userId},
+		#{taskId},
+		#{msgDetails},
+		#{sendUsers},
+		#{type},
+		#{taskName},
+		#{miniType},
+		#{sendType},
+		#{minisiteId},
+		#{sendTime ,typeHandler=dateTH},
+		'0',
+		#{amountUsers},
+		#{teaCity},
+		#{sendNames},
+		sysdate(),
+		#{teaName},
+		#{schoolName})
+	  </insert>
+	  
+	  <resultMap type="com.istudy.server.xxt.vo.HisTaskVO" id="getHisTaskVOByIdMap">
+	 	<result column="send_time" property="sendTime" typeHandler="dateTH"/>
+	 	<!-- <result column="tea_name" property="teaName" typeHandler="blobTH"/>
+	 	<result column="school_name" property="schoolName" typeHandler="blobTH"/> -->
+	 	<result column="send_users" property="sendUsers" typeHandler="blobTH"/>
+	 </resultMap>
+	  <select id="getHisTaskVOById" resultMap="getHisTaskVOByIdMap">
+	  	SELECT 
+		  	t.id,
+			t.minisite_id as minisiteId,
+			m.type as miniType,
+			t.task_name as taskName,
+			t.task_id as taskId,
+			t.msg_details as msgDetails,
+			t.send_users as sendUsers,
+			t.type,
+			tsk.remark,
+			m.mini_url as miniUrl,
+			t.send_type sendType,
+			t.send_time,
+			t.send_status as sendStatus,
+			t.send_names as sendNames,
+			t.amount_users as amountUsers
+	  	FROM cms_tea_send_his t, cms_minisite_info m, cms_task_info tsk
+	  	where  t.id = #{id} 
+	  	and t.minisite_id = m.id 
+	  	and t.task_id = tsk.id
+	  </select>
+	  
+	  <delete id="delHisTaskByMinisiteID" parameterType="string">
+		delete from cms_tea_send_his where minisite_id=#{id}
+	</delete>
+	
+	<update id="modHisTaskStatusInfo">
+		update cms_tea_send_his
+		set send_status =#{sendStatus},
+			failed_users = #{failedUsers}
+		where id=#{id}
+	</update>
+	
+	<update id="modHisTaskStatusInfo1">
+		update cms_tea_send_his
+		set send_status = '1'
+		where id=#{id}
+	</update>
+	
+	
+	<select id="getCMSTaskByStatus" parameterType="string" resultMap="getHisTaskVOByIdMap">
+	  	SELECT 
+		  	t.id,
+			t.msg_details as msgDetails,
+			t.send_users as sendUsers,
+			t.type,
+			m.mini_url as miniUrl,
+			t.failed_users as failedUsers,
+			t.tea_city as teaCity,
+			t.send_status as sendStatus,
+			t.tea_name as teaName,
+			t.school_name as schoolName
+	  	FROM cms_tea_send_his t, cms_minisite_info m
+	  	where  
+	  		t.send_time between date_sub(sysdate(), interval #{days} day) and sysdate()
+	  	and t.send_status='0'
+	  	and t.minisite_id = m.id 
+	  	limit 10
+	  </select>
+	  
+     <resultMap type="com.istudy.server.cms.vo.CMSTaskVO" id="getCMSTaskVOByIdMap">
+	 	<result column="active_date" property="activeDate" typeHandler="dateTH"/>
+	 	<result column="valid_date" property="validDate" typeHandler="dateTH"/>
+	 	<result column="details" property="miniDetails" typeHandler="blobTH"/>
+	 	<result column="schooIds" property="schooIds" typeHandler="blobTH"/>
+	 	<result column="failedSchooIds" property="failedSchooIds" typeHandler="blobTH"/>
+	 </resultMap>
+	 
+	  <select id="getCMSTaskByStatus2" parameterType="string" resultMap="getCMSTaskVOByIdMap">
+	  	SELECT 
+		  	t.id,
+			t.citys,
+			t.grades,
+			t.active_date,
+			t.valid_date,
+			t.task_name as taskName,
+			m.mini_url as miniUrl,
+			m.details,
+			m.title as miniTitle,
+			m.subject_type as subjectType,
+			m.share_type as shareType,
+			t.schoolIds,
+			t.failedSchoolIds,
+			t.failedGrades,
+			t.rule
+			
+			
+	  	FROM cms_task_info t, cms_minisite_info m
+	  	where  
+	  		sysdate() between t.active_date and t.valid_date
+	  	and t.send_public_status!='5'
+	  	and t.send_public_status!='3'
+	  	and t.minisite_id = m.id 
+	  	and t.valid_date is not null
+	  </select>
+	  
+	  	<update id="modCMSTaskStatusInfo">
+		update cms_task_info
+		set send_public_status = '3',
+		failedSchoolIds = NULL,
+		failedGrades = NULL
+		where id = #{id}
+	</update>
+	
+	<update id="updateFailedSchools">
+		update cms_task_info
+		set send_public_status = '4',
+		failedSchoolIds = #{failedSchoolIds}
+		where id = #{id}
+	</update>
+	
+	<update id="updateFailedGrades">
+		update cms_task_info
+		set send_public_status = '4',
+		failedGrades = #{failedGrades}
+		where id = #{id}
+	</update>
+	
+	<!--校园＋文章推送状态同步 -->
+	<select id="getWillSyncIstudyArticleTasks" parameterType="string"  resultMap="getHisTaskVOByIdMap">
+		SELECT 
+		t.id,
+		t.user_id as userId,
+		t.minisite_id as minisiteId
+		FROM cms_tea_send_his t
+		where 
+			t.send_time between date_sub(sysdate(), interval #{days} day) and sysdate()
+			and t.send_status = '3'
+			and t.sync_status != '1'
+	</select>
+	
+	<update id="updateSyncArticleStatusSuccess">
+		update cms_tea_send_his
+		set sync_status='1'
+		where id = #{id}
+	</update>
+
+	<update id="updateCMSTaskInfo">
+		update cms_task_info
+		
+		set msg_id=(CASE ISNULL(msg_id) WHEN 1 THEN #{msgId} ELSE CONCAT(msg_id,',',#{msgId}) END)
+		
+		where id = #{id}
+	</update>
+	
+	<update id="updateCMSTaskInfo1">
+		update cms_task_info
+		
+		set msg_id=#{msgId}
+		
+		where id = #{id}
+	</update>  
+	
+	 <update id="updateXXTSmsSnInfo">
+		update cms_tea_send_his
+		
+		set sms_sn =(CASE ISNULL(sms_sn) WHEN 1 THEN #{smssn} ELSE CONCAT(sms_sn,',',#{smssn}) END)
+		
+		where id = #{id}
+	</update> 
+	
+	
+	<select id="getKeyByCityUserId" resultType="com.istudy.server.xxt.vo.KeyVO">
+	
+		select 
+		key_word as keyWord
+		from xxt_tea_key	
+		where city_id = #{cityId}
+		and user_id = #{userId}
+		
+	</select>
+	
+	
+	<update id="updateKeyUser">
+	UPDATE xxt_tea_key
+		SET
+  	city_id = #{cityId},
+  	user_id = #{userId},
+  	date_time = SYSDATE() 
+	WHERE city_id IS NULL 
+  	AND user_id IS NULL 
+	ORDER BY id 
+	LIMIT 3
+	
+	</update>
+	
+	<select id="getXXTTask4pcByTeacher" resultMap="getCMSTaskVOByIdMap">
+	<![CDATA[
+	SELECT 
+		 t.id,
+		 t.task_name as taskName,
+		 t.grades,
+		 t.active_date as activeDate,
+		 m.type as miniType,
+		 m.title as miniTitle,
+		 m.subject_type as subjectType,
+		 m.share_type as shareType
+	  FROM cms_task_info t , cms_minisite_info m
+	  WHERE 
+	  t.active_date <= sysdate()
+	  and t.valid_date >= sysdate()
+	  ]]> 
+	  <if test="grades != null and grades.size != 0">
+	  	  and(t.grades is null OR t.grades = '' OR
+		  <foreach separator="OR" index="idx" collection="grades" item="gradeId">
+		   t.grades like '%,${gradeId},%'
+		  </foreach>
+		  )
+	  </if>
+	  and (t.schoolIds is null or t.schoolIds='' or t.schoolIds like '%,${schoolId}|%')
+	  and t.citys like  '%,${cityId},%'
+	  and t.minisite_id=m.id
+	  order by t.sort_date desc,t.create_date desc
+	  LIMIT 0,6
+	</select>
+	
+	
+</mapper>

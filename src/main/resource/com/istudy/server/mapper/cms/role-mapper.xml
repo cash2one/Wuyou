@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.cms.service.CMSRoleService">
+	 <resultMap type="java.util.LinkedHashMap" id="mapResult"></resultMap>
+	 <select id="getRoleInfo" resultType="com.istudy.server.cms.vo.RoleVO">
+	 	<![CDATA[
+	 	 SELECT 
+	 	 id,
+	 	 role_name as roleName,
+	 	 role_power as rolePower
+	 	 FROM cms_role_info
+	 	 WHERE id IS NOT NULL
+	 	]]>
+	 </select>
+</mapper>

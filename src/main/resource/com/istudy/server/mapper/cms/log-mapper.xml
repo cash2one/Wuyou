@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.cms.service.CMSLogService">
+	<insert id="saveLogByActive" parameterType="com.istudy.server.cms.vo.LogVO">
+    <![CDATA[ 
+		INSERT INTO cms_log_info
+		(user_name,role_name,ip,log_info,active_date,enterpriseName)
+		VALUES
+		(#{userName},#{roleName},#{ip},#{logInfo},#{activeDate},#{enterpriseName});
+		]]> 
+	</insert>
+	
+	
+	<select id="getRoleNameByUserName" resultType="com.istudy.server.cms.vo.LogVO">
+		select
+		a.username as userName,
+		a.account_desc as accountDesc,
+		e.enterpriseName as enterpriseName
+	 	from system_account a,system_enterprise e
+	    where a.username=#{userName}
+	    and a.enterpriseID = e.enterpriseID
+	</select>
+</mapper>

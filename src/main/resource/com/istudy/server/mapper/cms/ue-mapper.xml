@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.cms.service.UEService">
+	 <select id="saveUERegister" resultType="com.istudy.server.cms.vo.UERegisterVO">
+	 	<![CDATA[
+	 	 insert into cms_ue_register
+	 	 (name,birthYear,gender,identity,school,grade,subject,phone,email,uuid,createDate,addr)
+	 	 values 
+	 	 (#{name},#{birthYear},#{genderValue},#{identityValue},#{school},#{grade},#{subject},#{phone},#{email},#{uuid},sysdate(),#{addr});
+	 	]]>
+	 </select>
+</mapper>

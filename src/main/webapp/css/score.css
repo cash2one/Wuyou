@@ -1,0 +1,42 @@
+body,h1,h2,h3,h4,h5,h6,dl,dd,ul,ol,p,blockquote,form,fieldset,figure{margin:0;}
+ul,ol,menu,th,td,legend,fieldset{padding:0;}
+body{font:72.5%/1.5 arial, sans-serif;}
+ul,ol,menu{list-style-type:none;}
+table{border-spacing:0;border-collapse:collapse;}
+fieldset{border:none;}
+blockquote,q{quotes:none;}
+blockquote:before,blockquote:after,q:before,q:after{content:"";}
+a{text-decoration:none;outline:0 none;color:#00aff0;}
+a:hover,a:active{text-decoration:underline;color:#00aff0;}
+
+.ta-c{text-align:center;}
+.ta-r{text-align:right;}
+.ta-l{text-align:left;}
+
+body{background-color:#f4f4f4;color:#333;}
+.page-header{height:40px;background-color:#00aff0;padding:0.5em 10px;border-bottom:1px solid #0588ba;}
+.page-header .nav{float:left;width:81px;height:37px;font-size:1.3em;line-height:37px;text-indent:30px;color:#fff;
+    text-decoration:none;background-image:url(../images/nav-bg.png);position:relative;}
+.page-header h1{float:left;width:100%;font-size:2.2em;text-align:center;line-height:40px;color:#fff;
+    text-shadow:2px 2px 0 hsla(0, 0%, 0%, 0.2);margin:0 -88px 0 0;}
+.page-header h1.mar-l{margin-left:-81px;}
+.page-header .logo{float:right;}
+.page-main h2{font-size:1.8em;text-align:center;color:#222;padding:0.5em 0;}
+.art-main{margin:0 10px;}
+.art-main section{margin-bottom:10px;}
+.score-table{width:100%;border:1px solid #c6c6c6;background-color:#fff;font-size:1.3em;}
+.score-table td{padding:0 1em;}
+.score-table thead td{background-color:#f2f1f1;line-height:2;}
+.score-table tbody td{line-height:2.3;border-bottom:1px solid #c6c6c6;}
+.score-table tbody tr:last-child td{border-bottom:none;}
+.score-col col:first-child, .score-col col:last-child{width:100px;}
+.ran-rep-tab tr td:last-child{text-align:right;}
+.fore-table{width:100%;table-layout:fixed;background-color:#fff;text-align:center;}
+.fore-table th, .fore-table td{border:1px solid #c6c6c6;padding:0.5em 0.2em;}
+.fore-table th{font-weight:normal;}
+.fore-table td{font-size:1.2em;}
+.fore-table strong{font-size:1.2em;color:#e20000;text-decoration:underline;}
+
+
+
+html{}

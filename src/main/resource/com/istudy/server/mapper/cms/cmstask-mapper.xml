@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.cms.service.CMSTaskService">
+	<insert id="saveTaskInfo">
+		INSERT INTO cms_task_info
+		(task_name,minisite_id,msg_details,remark,
+		grades,active_date
+		,citys,creator,creatorEntId,create_date,valid_date,schoolIds,rule)
+		VALUES
+		(#{taskName},#{minisiteId},#{msgDetails},#{remark},#{grades},#{activeDate},#{citys},#{creator},#{creatorEntId},sysdate(),#{validDate},#{schoolIds},#{rule})
+	</insert>
+
+	<update id="modiTaskInfo">
+		update cms_task_info
+		set
+		task_name = #{taskName},
+		msg_details = #{msgDetails},
+		remark = #{remark},
+		grades = #{grades},
+		active_date = #{activeDate},
+		citys = #{citys},
+		update_date = sysdate(),
+		valid_date = #{validDate},
+		schoolIds = #{schoolIds},
+		rule = #{rule}
+		where id = #{id}
+	</update>
+
+	<delete id="delCMSTaskByID" parameterType="string">
+		delete from
+		cms_task_info where id=#{id}
+	</delete>
+	<delete id="delCMSTaskByMinisiteID" parameterType="string">
+		delete from
+		cms_task_info where minisite_id=#{id}
+	</delete>
+
+	<select id="getCMSXXTTaskInfoById" parameterType="string"
+		resultType="com.istudy.server.cms.vo.CMSTaskVO">
+		SELECT
+		t.id,
+		t.task_name as taskName,
+		t.msg_details as msgDetails,
+		t.remark,
+		t.grades,
+		m.type,
+		m.id as minisiteId,
+		m.type ,
+		m.mini_url as miniUrl
+		FROM cms_task_info t
+		,cms_minisite_info m
+		where t.id=#{id} and t.minisite_id=m.id
+	</select>
+
+	<resultMap type="com.istudy.server.cms.vo.CMSTaskVO" id="getCMSTaskInfoByIdMap">
+		<result column="active_date" property="activeDate" typeHandler="dateTH" />
+		<result column="valid_date" property="validDate" typeHandler="dateTH" />
+		<result column="sort_date" property="sortDate" typeHandler="dateTH" />
+		<result column="miniDetails" property="miniDetails"
+			typeHandler="blobTH" />
+	</resultMap>
+	<select id="getCMSTaskInfoById" parameterType="string"
+		resultMap="getCMSTaskInfoByIdMap">
+		SELECT
+		t.id,
+		t.task_name as taskName,
+		t.msg_details as msgDetails,
+		t.remark,
+		t.citys,
+		t.grades,
+		t.active_date,
+		t.valid_date,
+		t.sort_date,
+		t.rule,
+		t.msg_id as msgId,
+		t.send_public_status as sendPublicStatus,
+		t.schoolIds as schoolIds,
+		m.type,
+		m.mini_url as miniUrl,
+		m.subject_type as subjectType
+		FROM cms_task_info t ,cms_minisite_info m
+		where t.id=#{id} and t.minisite_id=m.id
+	</select>
+
+	<update id="setTop" parameterType="string">
+	update cms_task_info
+		set sort_date = sysdate()
+		where id = #{id}
+	</update>
+
+	<update id="removeTop" parameterType="string">
+	update cms_task_info
+		set sort_date = null
+		where id = #{id}
+	</update>
+
+	<!-- 推送到校讯通APP公共账号相关配置 -->
+	<insert id="saveTaskInfoForXXT">
+		INSERT INTO cms_task_info_for_xxt
+		(task_name,minisite_id,msg_details,remark,news_thumb_img,
+		grades,active_date
+		,citys,creator,creatorEntId,create_date)
+		VALUES
+		(#{taskName},#{minisiteId},#{msgDetails},#{remark},#{newsThumbImg},#{grades},#{activeDate},#{citys},#{creator},#{creatorEntId},sysdate())
+	</insert>
+
+
+	<update id="modiTaskInfoForXXT">
+		update cms_task_info_for_xxt
+		set
+		task_name = #{taskName},
+		msg_details = #{msgDetails},
+		remark = #{remark},
+		grades = #{grades},
+		active_date = #{activeDate},
+		citys = #{citys},
+		update_date = sysdate()
+		where id = #{id}
+	</update>
+
+	<delete id="delCMSTaskForXXTByID" parameterType="string">
+		delete from
+		cms_task_info_for_xxt where id=#{id}
+	</delete>
+
+	<select id="getCMSTaskInfoForXXTById" parameterType="string"
+		resultMap="getCMSTaskInfoByIdMap">
+		SELECT
+		t.id,
+		t.task_name as taskName,
+		t.msg_details as msgDetails,
+		t.remark,
+		t.citys,
+		t.grades,
+		t.active_date,
+		t.send_public_status as sendPublicStatus,
+		m.type,
+		m.mini_url as miniUrl
+		FROM
+		cms_task_info_for_xxt t ,cms_minisite_info m
+		where t.id=#{id} and t.minisite_id=m.id
+	</select>
+
+	<select id="getWillSendXXTPublicAccount" parameterType="string"
+		resultType="com.istudy.server.cms.vo.CMSTaskVO">
+		SELECT
+		t.id,
+		t.task_name as taskName,
+		t.news_thumb_img as newsThumbImg,
+		t.citys,
+		t.grades,
+		m.mini_url as miniUrl
+		FROM cms_task_info_for_xxt t
+		,cms_minisite_info m
+		where
+		t.active_date between date_sub(sysdate(), interval #{days} day) and sysdate()
+		and t.send_public_status!='3'
+		and t.minisite_id=m.id
+		and m.type!='0'
+	</select>
+
+	<update id="updateSendPublicStatusSuccessForXXT">
+		update cms_task_info_for_xxt
+		set
+		send_public_status='3'
+		where id = #{id}
+	</update>
+
+
+
+	<!-- 推送到校园＋ APP相关配置 -->
+	<insert id="saveTaskInfoForXiaoyuan">
+		INSERT INTO cms_task_info_for_xiaoyuan
+		(task_name,minisite_id,msg_details,remark,news_thumb_img,
+		grades,active_date
+		,citys,creator,creatorEntId,create_date)
+		VALUES
+		(#{taskName},#{minisiteId},#{msgDetails},#{remark},#{newsThumbImg},#{grades},#{activeDate},#{citys},#{creator},#{creatorEntId},sysdate())
+	</insert>
+
+
+	<update id="modiTaskInfoForXiaoyuan">
+		update
+		cms_task_info_for_xiaoyuan
+		set
+		task_name = #{taskName},
+		msg_details = #{msgDetails},
+		remark = #{remark},
+		grades = #{grades},
+		active_date = #{activeDate},
+		citys = #{citys},
+		update_date = sysdate()
+		where id = #{id}
+	</update>
+
+	<delete id="delCMSTaskForXiaoyuanByID" parameterType="string">
+		delete from
+		cms_task_info_for_xiaoyuan where id=#{id}
+	</delete>
+
+	<select id="getCMSTaskInfoForXiaoyuanById" parameterType="string"
+		resultMap="getCMSTaskInfoByIdMap">
+		SELECT
+		t.id,
+		t.task_name as taskName,
+		t.msg_details as msgDetails,
+		t.remark,
+		t.citys,
+		t.grades,
+		t.active_date,
+		t.send_public_status as sendPublicStatus,
+		m.type,
+		m.mini_url as miniUrl
+		FROM
+		cms_task_info_for_xiaoyuan t ,cms_minisite_info m
+		where t.id=#{id} and t.minisite_id=m.id
+	</select>
+
+	<resultMap type="com.istudy.server.cms.vo.CMSTaskVO" id="MinisiteVOMap">
+		<result column="details" property="miniDetails" typeHandler="blobTH" />
+		<result column="short_details" property="miniShortDetails" typeHandler="blobTH"/>
+		<result column="faqs" property="faqs" typeHandler="blobTH"/>
+	</resultMap>
+
+
+	<select id="getWillSendXiaoyuanTasks" parameterType="string"
+		resultMap="MinisiteVOMap">
+		SELECT
+		t.id,
+		t.task_name as taskName,
+		t.news_thumb_img as newsThumbImg,
+		t.citys,
+		t.grades,
+		m.subject_type as subjectType,
+		t.minisite_id as minisiteId,
+		m.title as miniTitle,
+		m.mini_url as miniUrl,
+		m.details,
+		m.short_details,
+		m.faqs
+		FROM
+		cms_task_info_for_xiaoyuan t ,cms_minisite_info m
+		where
+		t.active_date between date_sub(sysdate(), interval #{days} day) and sysdate()
+		and t.send_public_status!='3'
+		and t.minisite_id=m.id
+		and m.type!='0'
+	</select>
+
+	<update id="updateSendPublicStatusSuccessForXiaoyuan">
+		update cms_task_info_for_xiaoyuan
+		set
+		send_public_status='3'
+		where id = #{id}
+	</update>
+
+	<select id="getWillSendXiaoyuanNoticeTasks" parameterType="string"
+		resultMap="MinisiteVOMap">
+		SELECT
+		t.id,
+		t.task_name as taskName,
+		t.news_thumb_img as newsThumbImg,
+		t.citys,
+		t.grades,
+		m.subject_type as subjectType,
+		t.minisite_id as minisiteId,
+		t.active_date as activeDate,
+		m.title as miniTitle,
+		m.mini_url as
+		miniUrl,
+		m.details
+		FROM cms_task_info_for_xiaoyuan t ,cms_minisite_info
+		m
+		where
+		t.send_public_status!='5'
+		and t.send_public_status!='3'
+		and m.subject_type='1'
+		and t.minisite_id=m.id
+		and m.type!='0'
+		and t.active_date>sysdate()
+	</select>
+
+
+	<update id="updateSendNoticePublicStatusSuccessForXiaoyuan">
+		update cms_task_info_for_xiaoyuan
+		set
+		send_public_status='5'
+		where id = #{id}
+	</update>
+
+
+	<!--今日家长课程推送消息 -->
+	<insert id="saveTaskInfoForIstudy">
+		INSERT INTO cms_task_info_for_istudy
+		(task_name,minisite_id,msg_details,remark,news_thumb_img,
+		grades,active_date
+		,citys,creator,creatorEntId,create_date)
+		VALUES
+		(#{taskName},#{minisiteId},#{msgDetails},#{remark},#{newsThumbImg},#{grades},#{activeDate},#{citys},#{creator},#{creatorEntId},sysdate())
+	</insert>
+
+
+	<update id="modiTaskInfoForIstudy">
+		update
+		cms_task_info_for_istudy
+		set
+		task_name = #{taskName},
+		msg_details = #{msgDetails},
+		remark = #{remark},
+		grades = #{grades},
+		active_date = #{activeDate},
+		citys = #{citys},
+		update_date = sysdate()
+		where id = #{id}
+	</update>
+
+	<delete id="delCMSTaskForIstudyByID" parameterType="string">
+		delete from
+		cms_task_info_for_istudy where id=#{id}
+	</delete>
+
+	<select id="getCMSTaskInfoForIstudyById" parameterType="string"
+		resultMap="getCMSTaskInfoByIdMap">
+		SELECT
+		t.id,
+		t.task_name as taskName,
+		t.msg_details as msgDetails,
+		t.remark,
+		t.citys,
+		t.grades,
+		t.active_date,
+		m.type,
+		m.mini_url as miniUrl
+		FROM
+		cms_task_info_for_istudy t ,cms_minisite_info m
+		where t.id=#{id} and t.minisite_id=m.id
+	</select>
+
+	<select id="getWillSendIstudyTasks" parameterType="string"
+		resultType="com.istudy.server.cms.vo.CMSTaskVO">
+		SELECT
+		t.id,
+		t.task_name as taskName,
+		t.news_thumb_img as newsThumbImg,
+		t.citys,
+		t.grades,
+		m.mini_url as miniUrl
+		FROM cms_task_info_for_istudy t
+		,cms_minisite_info m
+		where
+		t.active_date between date_sub(sysdate(), interval #{days} day) and sysdate()
+		and t.send_public_status!='3'
+		and t.minisite_id=m.id
+		and m.type!='0'
+	</select>
+
+	<update id="updateSendPublicStatusSuccessForIstudy">
+		update cms_task_info_for_istudy
+		set
+		send_public_status='3'
+		where id = #{id}
+	</update>
+
+
+	<!--文章推送 -->
+	<select id="getWillSendIstudyArticleTasks" parameterType="string"
+		resultMap="getCMSTaskInfoByIdMap">
+		SELECT
+		t.id,
+		t.task_name as taskName,
+		t.news_thumb_img as newsThumbImg,
+		t.citys,
+		t.grades,
+		m.id as minisiteId,
+		m.mini_url as miniUrl,
+		m.details
+		miniDetails,
+		m.title miniTitle
+		FROM cms_task_info t ,cms_minisite_info m
+		where
+		t.active_date between date_sub(sysdate(), interval #{days} day) and sysdate()
+		and t.send_public_status!='3'
+		and t.minisite_id=m.id
+		and m.type!='0'
+	</select>
+
+	<update id="updateSendArticleStatusSuccess">
+		update cms_task_info
+		set
+		send_public_status='3'
+		where id = #{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.common.service.BaseService">
+	 <resultMap type="com.istudy.server.xxt.vo.HisTaskVO" id="xxt_task_his_list_data_map">
+	 	<result column="send_time" property="sendTime" typeHandler="dateTH"/>
+	 	<result column="create_date" property="createDate" typeHandler="dateTH"/>
+	 	<result column="active_date" property="activeDate" typeHandler="dateTH"/>
+	 </resultMap>
+	 <select id="xxt_task_his_list_data" resultMap="xxt_task_his_list_data_map">
+	 	<![CDATA[
+	 	 	SELECT id,
+	 	 	task_name as taskName,
+	 	 	task_id as taskId,
+	 	 	mini_type as miniType,
+	 	 	type,
+	 	 	send_type as sendType,
+	 	 	send_time,
+	 	 	send_status as sendStatus,
+	 	 	create_date ,
+	 	 	amount_users  as amountUsers
+	 	 	FROM cms_tea_send_his
+	 	 	where user_id =#{param.userId}
+	 	 	order by id desc 
+	 	 	LIMIT #{startIndex},#{pageSize}
+	 	]]>
+	 </select>
+	 
+	 <select id="xxt_task_his_list_size" resultType="long">
+	 	<![CDATA[
+	 	 	select count(*) from cms_tea_send_his
+	 	 	where user_id =#{param.userId} 
+	 	]]>
+	 </select>
+	 
+	 <resultMap type="com.istudy.server.cms.vo.MinisiteVO" id="minisite_list_data_map">
+	 	<result column="create_date" property="createDate" typeHandler="dateTH"/>
+	 </resultMap>
+	 
+	 <select id="minisite_list_data" resultMap="minisite_list_data_map">
+		SELECT 
+		id,
+		type,
+		create_date,
+		mini_url as miniUrl,
+		task_name as taskName,
+		subject_type as subjectType,
+		title, 
+		share_type as shareType,
+		creatorEntId,
+		creator
+		FROM cms_minisite_info
+		where valid_status!='N'
+		<if test="param.subjectType!=-1">
+		and subject_type=#{param.subjectType }
+		</if>
+		<if test="param.grade!=0">
+		and grades like '%,${param.grade },%'
+		</if>
+		<if test="param.month!=0">
+		and month(create_date) = ${param.month }
+		</if>
+		<!-- 超级管理员能查看所有公司的资源 -->
+		<if test="param.sessionUser.vendorType!=4 and param.sessionUser.vendorType!=2">
+		and creatorEntId = #{param.sessionUser.enterpriseID}
+		</if>
+		order by id desc
+		LIMIT #{startIndex},#{pageSize}
+	</select>
+	
+	<select id="minisite_list_size" resultType="long">
+		select 
+			count(1)
+			from cms_minisite_info
+			where valid_status!='N'
+			<if test="param.subjectType!=-1">
+			and subject_type=#{param.subjectType }
+			</if>
+			<if test="param.grade!=0">
+			and grades like '%,${param.grade },%'
+			</if>
+			<if test="param.month!=0">
+			and month(create_date) = ${param.month }
+			</if> 
+			<!-- 超级管理员能查看所有公司的资源 -->
+			<if test="param.sessionUser.vendorType!=4 and param.sessionUser.vendorType!=2">
+			and creatorEntId = #{param.sessionUser.enterpriseID}
+			</if>
+	</select>
+	
+	<!-- 筛选列表 -->
+	<!-- <select id="search_minisite_list_data" resultMap="minisite_list_data_map">
+		
+		SELECT 
+		id,
+		type,
+		create_date,
+		mini_url as miniUrl,
+		task_name as taskName,
+		subject_type as subjectType,
+		title
+		FROM cms_minisite_info
+		where valid_status!='N'
+		<if test="param.subjectType!=-1">
+		and subject_type=#{param.subjectType }
+		</if>
+		<if test="param.grade!=0">
+		and grades like '%,${param.grade },%'
+		</if>
+		order by id desc
+		LIMIT #{startIndex},#{pageSize}
+		
+	</select>
+	
+	<select id="search_minisite_list_size" resultType="long">
+		select 
+			count(1)
+			from cms_minisite_info
+			where valid_status!='N'
+			<if test="param.subjectType!=-1">
+			and subject_type=#{param.subjectType }
+			</if>
+			<if test="param.grade!=0">
+			and grades like '%,${param.grade },%'
+			</if>
+	</select> -->
+	
+	<resultMap type="com.istudy.server.cms.vo.CMSTaskVO" id="cms_task_list_data_map">
+		<result column="active_date" property="activeDate" typeHandler="dateTH"/>
+		<result column="sort_date" property="sortDate" typeHandler="dateTH"/>
+	</resultMap>
+	<select id="cms_task_list_data" resultMap="cms_task_list_data_map">
+		<if test="param.pushType == 1">
+		SELECT 
+			t.id,
+			t.task_name as taskName,
+			m.type,
+			m.title as miniTitle,
+			t.active_date,
+			t.sort_date,
+			m.subject_type as subjectType,
+			t.send_public_status as sendPublicStatus,
+			t.creator,
+			t.creatorEntId
+		FROM cms_task_info t left join cms_minisite_info m
+		on t.minisite_id=m.id
+		WHERE 1=1
+		<if test="param.grade!=0">
+			and t.grades like '%,${param.grade },%'
+		</if>
+	    <if test="param.month!=0">
+		and month(t.active_date) = ${param.month }
+		</if> 
+		<if test="param.taskType == 1">and sysdate() > t.active_date and t.valid_date>sysdate()</if>
+		<if test="param.taskType == 2">and t.active_date > sysdate()</if>
+		<if test="param.taskType == 3">
+		and sysdate()>t.valid_date
+		</if>
+		<!-- 超级管理员能查看所有公司的资源，校讯通官方能查看所有校讯通任务 -->
+		<if test="param.sessionUser.vendorType!=4 and param.sessionUser.vendorType!=2 and param.sessionUser.vendorType!=3">
+		and t.creatorEntId = #{param.sessionUser.enterpriseID}
+		</if>
+		order by t.sort_date desc,t.id desc
+		LIMIT #{startIndex},#{pageSize}
+		</if>
+		
+		<if test="param.pushType == 2">
+		SELECT 
+			t.id,
+			t.task_name as taskName,
+			m.type,
+			m.title as miniTitle,
+			t.active_date,
+			t.send_public_status as sendStatus,
+			m.subject_type as subjectType,
+			t.creator,
+			t.creatorEntId
+		FROM cms_task_info_for_xxt t left join cms_minisite_info m
+		on t.minisite_id=m.id
+		WHERE 1=1
+		<if test="param.grade!=0">
+			and t.grades like '%,${param.grade },%'
+		</if>
+	    <if test="param.month!=0">
+		and month(t.active_date) = ${param.month }
+		</if> 
+		<if test="param.taskType == 1">and sysdate() > t.active_date</if>
+		<if test="param.taskType == 2">and t.active_date > sysdate()</if>
+		<if test="param.taskType == 3">
+		and 1!=1
+		</if>
+		<!-- 超级管理员能查看所有公司的资源 -->
+		<if test="param.sessionUser.vendorType!=4 and param.sessionUser.vendorType!=2">
+		and t.creatorEntId = #{param.sessionUser.enterpriseID}
+		</if>
+		order by t.id desc
+		LIMIT #{startIndex},#{pageSize}
+		</if>
+		
+		<if test="param.pushType == 3">
+		SELECT 
+			t.id,
+			t.task_name as taskName,
+			m.type,
+			m.title as miniTitle,
+			t.active_date,
+			t.send_public_status as sendStatus,
+			m.subject_type as subjectType,
+			t.creator,
+			t.creatorEntId
+		FROM cms_task_info_for_xiaoyuan t left join cms_minisite_info m
+		on t.minisite_id=m.id
+		WHERE 1=1		
+		<if test="param.grade!=0">
+			and t.grades like '%,${param.grade },%'
+		</if>
+	    <if test="param.month!=0">
+		and month(t.active_date) = ${param.month }
+		</if> 
+		<if test="param.taskType == 1">and sysdate() > t.active_date</if>
+		<if test="param.taskType == 2">and t.active_date > sysdate()</if>
+		<if test="param.taskType == 3">
+		and 1!=1
+		</if>
+		<!-- 超级管理员能查看所有公司的资源 -->
+		<if test="param.sessionUser.vendorType!=4 and param.sessionUser.vendorType!=2">
+		and t.creatorEntId = #{param.sessionUser.enterpriseID}
+		</if>
+		order by t.id desc
+		LIMIT #{startIndex},#{pageSize}
+		</if>
+	</select>
+	
+	<select id="cms_task_list_size" resultType="long">
+	<if test="param.pushType == 1">
+		SELECT 
+			count(1)
+		FROM cms_task_info t
+		WHERE 1=1
+		<if test="param.grade!=0">
+			and t.grades like '%,${param.grade },%'
+		</if>
+	    <if test="param.month!=0">
+		and month(t.active_date) = ${param.month }
+		</if> 
+		<if test="param.taskType == 1">and sysdate() > t.active_date and t.valid_date>sysdate()</if>
+		<if test="param.taskType == 2">and t.active_date > sysdate()</if>
+		<if test="param.taskType == 3">
+		and sysdate()>t.valid_date
+		</if>  
+		<!-- 超级管理员能查看所有公司的资源，校讯通官方能查看所有校讯通任务 -->
+		<if test="param.sessionUser.vendorType!=4 and param.sessionUser.vendorType!=2 and param.sessionUser.vendorType!=3">
+		and t.creatorEntId = #{param.sessionUser.enterpriseID}
+		</if>
+	</if>
+	<if test="param.pushType == 2">
+		SELECT 
+			count(1)
+		FROM cms_task_info_for_xxt t
+		WHERE 1=1
+		<if test="param.grade!=0">
+			and t.grades like '%,${param.grade },%'
+		</if>
+	    <if test="param.month!=0">
+		and month(t.active_date) = ${param.month }
+		</if> 
+		<if test="param.taskType == 1">and sysdate() > t.active_date</if>
+		<if test="param.taskType == 2">and t.active_date > sysdate()</if>
+		<if test="param.taskType == 3">
+		and 1!=1
+		</if>	
+		<!-- 超级管理员能查看所有公司的资源 -->
+		<if test="param.sessionUser.vendorType!=4 and param.sessionUser.vendorType!=2">
+		and t.creatorEntId = #{param.sessionUser.enterpriseID}
+		</if>
+	</if>
+	
+	<if test="param.pushType == 3">
+		SELECT 
+			count(1)
+		FROM cms_task_info_for_xiaoyuan	t
+		WHERE 1=1
+		<if test="param.grade!=0">
+			and t.grades like '%,${param.grade },%'
+		</if>
+	    <if test="param.month!=0">
+		and month(t.active_date) = ${param.month }
+		</if> 
+		<if test="param.taskType == 1">and sysdate() > t.active_date</if>
+		<if test="param.taskType == 2">and t.active_date > sysdate()</if>
+		<if test="param.taskType == 3">
+		and 1!=1
+		</if>	
+		<!-- 超级管理员能查看所有公司的资源 -->
+		<if test="param.sessionUser.vendorType!=4 and param.sessionUser.vendorType!=2">
+		and t.creatorEntId = #{param.sessionUser.enterpriseID}
+		</if>
+	</if>	
+	</select>
+	
+	
+	 <select id="xxt_task_recommend_list_data" resultMap="xxt_task_his_list_data_map">
+	 	 <![CDATA[
+		 	 SELECT 
+			 	 t.id,
+			 	 m.type as miniType,
+			 	 t.active_date ,
+			 	 t.task_name as taskName,
+			 	 m.subject_type as subjectType
+		 	  FROM cms_task_info t , cms_minisite_info m
+		 	  where 
+		 	  t.active_date <= sysdate()
+		 	  and
+		 	  (t.grades like  '%,${param.gradeId}%,' and t.citys like  '%,${param.cityId}%,')
+		 	  and t.minisite_id=m.id
+		 	  order by t.id desc
+		 	  LIMIT #{startIndex},#{pageSize}
+	 	 ]]> 
+	 </select>
+	 
+	  <select id="xxt_task_recommend_list_size" resultType="long">
+	 	 <![CDATA[
+		 	 SELECT 
+			 	 count(1)
+		 	  FROM cms_task_info t , cms_minisite_info m
+		 	  where 
+		 	  t.active_date <= sysdate()
+		 	  and
+		 	  (t.grades like  '%,${param.gradeId}%,' and t.citys like  '%,${param.cityId}%,')
+		 	  and t.minisite_id=m.id
+	 	 ]]> 
+	 </select>
+	 
+	 <!-- 推送到校讯通APP公共账号相关任务配置 -->
+	 <select id="cms_task_list_for_xxt_data" resultMap="xxt_task_his_list_data_map">
+		SELECT 
+			t.id,
+			t.task_name as taskName,
+			m.type,
+			t.active_date,
+			t.send_public_status as sendStatus,
+			m.subject_type as subjectType
+		FROM cms_task_info_for_xxt t left join cms_minisite_info m
+		on t.minisite_id=m.id
+		order by t.id desc
+		LIMIT #{startIndex},#{pageSize}
+	</select>
+	
+	<select id="cms_task_list_for_xxt_size" resultType="long">
+		SELECT 
+			count(1)
+		FROM cms_task_info_for_xxt
+	</select>
+	
+	
+	
+	<!-- 推送到爱学网APP相关任务配置 -->
+	 <select id="cms_task_list_for_istudy_data" resultMap="xxt_task_his_list_data_map">
+		SELECT 
+			t.id,
+			t.task_name as taskName,
+			m.type,
+			t.active_date,
+			t.send_public_status as sendStatus,
+			m.subject_type as subjectType
+		FROM cms_task_info_for_istudy t left join cms_minisite_info m
+		on t.minisite_id=m.id
+		order by t.id desc
+		LIMIT #{startIndex},#{pageSize}
+	</select>
+	
+	<select id="cms_task_list_for_istudy_size" resultType="long">
+		SELECT 
+			count(1)
+		FROM cms_task_info_for_istudy
+	</select>
+	
+	
+		<!-- 推送到校园+APP相关任务配置 -->
+	 <select id="cms_task_list_for_xiaoyuan_data" resultMap="xxt_task_his_list_data_map">
+		SELECT 
+			t.id,
+			t.task_name as taskName,
+			m.type,
+			t.active_date,
+			t.send_public_status as sendStatus,
+			m.subject_type as subjectType
+		FROM cms_task_info_for_xiaoyuan t left join cms_minisite_info m
+		on t.minisite_id=m.id
+		order by t.id desc
+		LIMIT #{startIndex},#{pageSize}
+	</select>
+	
+	<select id="cms_task_list_for_xiaoyuan_size" resultType="long">
+		SELECT 
+			count(1)
+		FROM cms_task_info_for_xiaoyuan
+	</select>
+	
+
+	<!-- 权限管理部分 -->
+	<resultMap type="com.istudy.server.system.vo.EnterpriseVO" id="enterprise_list_data_map">
+	 </resultMap>
+	 
+	 <select id="enterprise_list_data" resultMap="enterprise_list_data_map">
+	 	select enterpriseID,enterpriseName,enterpriseDesc,vendorType
+	 	from system_enterprise
+	 	order by create_date desc
+		LIMIT #{startIndex},#{pageSize}
+	 </select>
+	 
+	<select id="enterprise_list_size" resultType="long">
+	<![CDATA[
+		select 
+			count(1)
+			from system_enterprise
+			]]>
+	</select>
+	
+	<select id="enterprise_list_query_data" resultMap="enterprise_list_data_map">
+	 	select enterpriseID,enterpriseName,enterpriseDesc,vendorType
+	 	from system_enterprise where enterpriseName like CONCAT('%','${enterpriseName}','%')
+		order by create_date desc
+		LIMIT #{startIndex},#{pageSize}
+	 </select>
+	 
+	<select id="enterprise_list_query_size" resultType="long">
+	<![CDATA[
+		select 
+			count(1)
+			from system_enterprise where enterpriseName like CONCAT('%','${enterpriseName}','%')
+			]]>
+	</select>
+	 
+	 <resultMap type="com.istudy.server.system.vo.AccountVO" id="account_list_map">
+	 </resultMap>
+	 
+	 <select id="account_list_data" resultMap="account_list_map">
+		select 
+	 	username,password,account_desc,enterpriseID
+	 	from system_account
+	 	where enterpriseID=#{enterpriseID}
+	 	order by create_date desc
+	 	LIMIT #{startIndex},#{pageSize}
+	 </select>
+	 <select id="account_list_size" resultType="long">
+		<![CDATA[
+		select 
+			count(1)
+			from system_account where enterpriseID=#{enterpriseID}
+			]]>
+	</select>
+	 
+	 <resultMap type="com.istudy.server.system.vo.RoleVO" id="role_list_map">
+	 </resultMap>
+	 <select id="role_list_data" resultMap="role_list_map">
+		select 
+	 	roleID,roleName,roleDesc
+	 	from system_role
+	 	order by create_date desc
+	 	LIMIT #{startIndex},#{pageSize}
+	 </select>
+	 <select id="role_list_size" resultType="long">
+		<![CDATA[
+		select 
+			count(1)
+			from system_role
+			]]>
+	</select>
+	
+	 <select id="role_for_chose_data" resultMap="role_list_map">
+		select 
+	 	roleID,roleName
+	 	from system_role
+	 	LIMIT #{startIndex},#{pageSize}
+	 </select>
+	 <select id="role_for_chose_size" resultType="long">
+		<![CDATA[
+		select 
+			count(1)
+			from system_role
+			]]>
+	</select>
+	
+	<select id="action_for_chose_data" resultMap="action_list_map">
+		select 
+	 	actionID,actionName
+	 	from system_action
+	 	LIMIT #{startIndex},#{pageSize}
+	 </select>
+	 <select id="action_for_chose_size" resultType="long">
+		<![CDATA[
+		select 
+			count(1)
+			from system_action
+			]]>
+	</select>
+	
+	<resultMap type="com.istudy.server.system.vo.ActionVO" id="action_list_map">
+	 </resultMap>
+	 <select id="action_list_data" resultMap="action_list_map">
+		select 
+	 	actionID,actionName,actionDesc,actionURL
+	 	from system_action
+	 	LIMIT #{startIndex},#{pageSize}
+	 </select>
+	 <select id="action_list_size" resultType="long">
+		<![CDATA[
+		select 
+			count(1)
+			from system_action
+			]]>
+	</select>
+	
+	<!-- 操作日志列表 -->
+	<resultMap type="com.istudy.server.cms.vo.LogVO" id="cms_log_list_data_map">
+	 	<result column="active_date" property="activeDate" typeHandler="dateTH"/>
+	 	<!-- <result column="miniDetails" property="miniDetails" typeHandler="blobTH" /> -->
+	 </resultMap>
+	 
+	<select id="cms_log_list_data" resultMap="cms_log_list_data_map">
+	 	 	SELECT id,
+	 	 	user_name as userName,
+	 	 	role_name as roleName,
+	 	 	ip,
+	 	 	log_info as logInfo,
+	 	 	active_date as activeDate,
+	 	 	enterpriseName
+	 	 	FROM cms_log_info
+	 	 	where 1=1
+	 	 	<if test="param.condition!=''">
+	 	 	and log_info like '%${param.condition }%'
+	 	 	</if>
+	 	 	order by id desc 
+	 	 	LIMIT #{startIndex},#{pageSize}
+	 </select>
+	 
+	 <select id="cms_log_list_size" resultType="long">
+	 	 	select count(*) from cms_log_info
+	 	 	where 1=1
+	 	 	<if test="param.condition!=''">
+	 	 	and log_info like '%${param.condition }%'
+	 	 	</if>
+	 </select>
+	 
+	<!-- 校讯通嵌入任务页面更多页面 -->
+	<select id="xxt_task_for_pc_list_data" resultMap="getCMSTaskVOByIdMap">
+	<![CDATA[
+	SELECT 
+		 t.id,
+		 t.task_name as taskName,
+		 t.grades,
+		 t.active_date as activeDate,
+		 m.type as miniType,
+		 m.title as miniTitle,
+		 m.subject_type as subjectType,
+		 m.share_type as shareType
+	  FROM cms_task_info t , cms_minisite_info m
+	  WHERE 
+	  t.active_date <= sysdate()
+	  and t.valid_date >= sysdate()
+	  ]]> 
+	  <if test="param.grades != null and param.grades.size != 0">
+	  	and(t.grades is null OR t.grades = '' OR
+		  <foreach separator="OR" index="idx" collection="param.grades" item="gradeId">
+		   t.grades like '%,${gradeId},%'
+		  </foreach>
+		)
+	  </if>
+	  and (t.schoolIds is null or t.schoolIds='' or t.schoolIds like '%,${param.schoolId}|%')
+	  and t.citys like '%,${param.cityId},%'
+	  and t.minisite_id=m.id
+	  order by t.sort_date desc,t.create_date desc
+	  LIMIT #{startIndex},#{pageSize}
+	</select>
+	
+	<select id="xxt_task_for_pc_list_size" resultType="long">
+	<![CDATA[
+ 	select count(*) from cms_task_info t, cms_minisite_info m
+ 	WHERE 
+	  t.active_date <= sysdate()
+	  and t.valid_date >= sysdate()
+	  ]]> 
+	  <if test="param.grades != null and param.grades.size != 0">
+	  	and(t.grades is null OR t.grades = '' OR
+		  <foreach separator="OR" index="idx" collection="param.grades" item="gradeId">
+		   t.grades like '%,${gradeId},%'
+		  </foreach>
+		)
+	  </if>
+	  and (t.schoolIds is null or t.schoolIds='' or t.schoolIds like '%,${param.schoolId}|%')
+	  and t.citys like '%,${param.cityId},%'
+	  and t.minisite_id=m.id
+	 </select>
+	 
+	<select id="minisite_report_list_data" resultMap="minisite_report_list_data_map">
+	SELECT
+	m.creator,
+	m.creatorEntId,
+	m.id AS minisiteId,
+	m.task_name AS taskName,
+	m.title AS miniTitle,
+	m.mini_url AS miniUrl,
+	m.subject_type AS subjectType,
+	m.create_date AS createDate,
+	T1.teacherActiveCount,
+	T2.teacherPushCount,
+	T3.parentEnterCount,
+	T4.teacherPushMsgTotal
+	FROM cms_minisite_info m
+	LEFT JOIN(
+		SELECT COUNT(DISTINCT v2.USERID, v2.cityId) AS
+		teacherActiveCount, v2.miniUri miniUri
+		FROM cms_minisite_info mi
+		INNER JOIN (SELECT *
+		FROM cms_minisite_user_action_v2
+		WHERE IDTYPE = 99 AND ACTION = 'page-enter-task') v2
+	ON v2.miniUri =
+	mi.mini_url
+	GROUP BY v2.miniUri) T1
+	ON m.mini_url = T1.miniUri
+	LEFT JOIN(
+		SELECT COUNT(DISTINCT v2.USERID, v2.cityId) AS teacherPushCount,
+		v2.miniUri miniUri
+		FROM cms_minisite_info mi
+		INNER JOIN (SELECT *
+		FROM cms_minisite_user_action_v2
+		WHERE IDTYPE = 99 AND ACTION = 'btnclick-push') v2
+		ON v2.miniUri = mi.mini_url
+		GROUP BY v2.miniUri) T2
+	ON m.mini_url = T2.miniUri
+	LEFT JOIN(
+		SELECT COUNT(DISTINCT v2.USERID, v2.cityId) AS parentEnterCount,
+		v2.miniUri miniUri
+		FROM cms_minisite_info mi
+		INNER JOIN (SELECT *
+		FROM cms_minisite_user_action_v2
+		WHERE IDTYPE = 99 AND ACTION = 'page-enter-article') v2
+		ON v2.miniUri = mi.mini_url
+		GROUP BY v2.miniUri) T3
+	ON m.mini_url = T3.miniUri
+	LEFT JOIN(
+		SELECT SUM(teh.amount_users) teacherPushMsgTotal, teh.minisite_id
+		minisite_id
+		FROM cms_minisite_info mi
+		INNER JOIN cms_tea_send_his teh
+	ON teh.minisite_id = mi.id
+	GROUP BY teh.minisite_id
+	) T4
+	ON m.id = T4.minisite_id
+	<!-- 超级管理员能查看所有公司的资源，校讯通官方能查看所有校讯通任务 -->
+	<if test="param.sessionUser.vendorType!=4 and param.sessionUser.vendorType!=2 and param.sessionUser.vendorType!=3">
+	where m.creatorEntId = #{param.sessionUser.enterpriseID}
+	</if>
+	<choose>
+		<when test="param.sort != null and param.sort != ''">
+			order by ${param.sort} desc, minisiteId desc 
+		</when>
+		<otherwise>
+			order by minisiteId desc 
+		</otherwise>
+	</choose>
+	LIMIT #{startIndex},#{pageSize}
+	</select>
+	
+	<select id="minisite_report_list_size" resultType="long">
+	 	 	select count(*) from cms_minisite_info m
+	 	 	<!-- 超级管理员能查看所有公司的资源，校讯通官方能查看所有校讯通任务 -->
+			<if test="param.sessionUser.vendorType!=4 and param.sessionUser.vendorType!=2 and param.sessionUser.vendorType!=3">
+			where m.creatorEntId = #{param.sessionUser.enterpriseID}
+			</if>
+	 </select>
+	 
+	<resultMap type="com.istudy.server.cms.vo.MinisiteReportVO" id="minisite_report_list_data_map">
+		<result column="create_date" property="createDate" typeHandler="dateTH"/>
+	</resultMap>
+	 
+	 <resultMap type="com.istudy.server.cms.vo.CMSTaskVO" id="getCMSTaskVOByIdMap">
+	 	<result column="active_date" property="activeDate" typeHandler="dateTH"/>
+	 	<result column="valid_date" property="validDate" typeHandler="dateTH"/>
+	 	<result column="details" property="miniDetails" typeHandler="blobTH"/>
+	 	<result column="schooIds" property="schooIds" typeHandler="blobTH"/>
+	 	<result column="failedSchooIds" property="failedSchooIds" typeHandler="blobTH"/>
+	 </resultMap>
+	 
+</mapper>

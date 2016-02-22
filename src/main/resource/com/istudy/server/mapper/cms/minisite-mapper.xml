@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.istudy.server.cms.service.MinisiteService">
+	<insert id="saveMinisiteInfo" parameterType="com.istudy.server.cms.vo.MinisiteVO">
+		INSERT INTO cms_minisite_info
+		(type,details,task_name,video_url,msg_details,title,label,
+		remark,teachers,mini_url,grades,mini_type_ids,suggest_month,create_date,update_date,creator,creatorEntId,subject_type,short_details,share_type,header_name)
+		VALUES
+		(#{type},
+		#{details,typeHandler=blobTH}
+		,#{taskName},#{videoUrl,typeHandler=blobTH},#{msgDetails},#{title},#{label},
+		#{remark},#{teachers},#{miniUrl},#{grades},#{miniTypeIds},#{suggestMonth}, SYSDATE(),sysdate(),#{creator},#{creatorEntId},#{subjectType},#{shortDetails,typeHandler=blobTH },#{shareType },#{headerName});
+	</insert>
+	
+	<select id="getMinisiteNameList" resultType="com.istudy.server.cms.vo.MinisiteVO">
+		SELECT 
+		id,
+		type,
+		task_name as taskName
+		FROM cms_minisite_info
+		LIMIT #{startIndex},#{pageSize}
+	</select>
+	
+	<resultMap type="com.istudy.server.cms.vo.MinisiteVO" id="MinisiteVOMap">
+		<result column="title" property="title" typeHandler="blobTH"/>
+		<result column="details" property="details" typeHandler="blobTH"/>
+		<result column="short_details" property="shortDetails" typeHandler="blobTH"/>
+		<result column="video_url" property="videoUrl" typeHandler="blobTH"/>
+	</resultMap>
+	
+	<select id="getMinisiteInfoById" parameterType="string" resultMap="MinisiteVOMap">
+		SELECT 
+		id,
+		details,
+		short_details,
+		task_name as taskName,
+		video_url videoUrl,
+		msg_details msgDetails,
+		title,
+		label,
+		remark,
+		teachers,
+		mini_url as miniUrl,
+		type,
+		grades,
+		mini_type_ids,
+		header_name as headerName,
+		suggest_month as suggestMonth,
+		subject_type as subjectType,
+		faqs,
+		share_type as shareType
+		FROM cms_minisite_info t
+		WHERE t.id=#{id}
+	</select>
+	
+	<select id="getBasicMinisiteInfoById" parameterType="string" resultType="com.istudy.server.cms.vo.MinisiteVO">
+		SELECT 
+		id,
+		task_name as taskName,
+		msg_details msgDetails,
+		type,
+		remark,
+		grades,
+		mini_url as miniUrl,
+		suggest_month as suggestMonth,
+		subject_type as subjectType
+		FROM cms_minisite_info t
+		WHERE t.id=#{id}
+	</select>
+	
+	<select id="getMinisiteSize" resultType="long">
+		select 
+			count(1)
+			from cms_minisite_info
+	</select>
+	
+	<update id="modiMinisiteInfo">
+		update cms_minisite_info
+		set type=#{type},
+			details = #{details},
+			short_details = #{shortDetails},
+			task_name = #{taskName},
+			video_url = #{videoUrl},
+			msg_details = #{msgDetails},
+			title = #{title},
+			label = #{label},
+			remark = #{remark},
+			mini_url = #{miniUrl},
+			grades = #{grades},
+			mini_type_ids = #{miniTypeIds},
+			suggest_month = #{suggestMonth},
+			update_date = sysdate(),
+			updator = #{updator},
+			subject_type = #{subjectType},
+			share_type = #{shareType},
+			header_name = #{headerName}
+		where id = #{id}
+	</update>
+	
+	<delete id="delMinisiteById">
+		delete from cms_minisite_info where id = #{id}
+	</delete>
+	<update id="delSoftMinisiteById">
+		update cms_minisite_info
+		set valid_status='N'
+		where id = #{id}
+	</update>
+	
+	<update id="saveFaqs">
+		update cms_minisite_info
+		set faqs = #{faqs,typeHandler=blobTH }
+		where id = #{id}
+	</update>
+</mapper>
